@@ -28,50 +28,54 @@ def parse_file_links(file_name):
     """
 
     # variables to hold info about searched lines
-    d = {}
-    d['links'] = []
-    d['teams'] = []
-    d['leagues'] = []
-    d['seasons'] = []
+    data = {}
+    data['links'] = []
+    data['teams'] = []
+    data['leagues'] = []
+    data['seasons'] = []
 
     # get searchable links
     with open(file_name, 'r') as file_in:
         for line in file_in:
-            m = re.search(r"/hatleagues/rosters\.php\?section=showTeamRoster&team=(\d+)&which=(\d+)&season=(\d{4})", line)
+            m = re.search(r"/hatleagues/rosters\.php\?section=showTeamRoster&team=(\d+)&which=(\d+)&season=(\d+)", line)
             if m:
-                d['links'].append(m.group(0))
-                d['teams'].append(m.group(1))
-                d['leagues'].append(m.group(2))
-                d['seasons'].append(m.group(3))
+                data['links'].append(m.group(0))
+                data['teams'].append(m.group(1))
+                data['leagues'].append(m.group(2))
+                data['seasons'].append(m.group(3))
     
-    return d
+    return data
 
-def scrape_buda(link_info, file_name_out):
+def scrape_buda(data, file_name_out):
     """
-    link_info is the dict of links, teams, leagues, seasons
+    data is the dict of links, teams, leagues, seasons
     """
 
     # get the player names, and put them in a .tsv file with team/league info
     with open(file_name_out, 'w') as file_out:
         base_url = "http://buda.org"
-        for i, link in enumerate(d['links']):
+        for i, link in enumerate(data['links']):
             # pause between requests, because I am a gentleman
-            sleep(3)
+            sleep(4)
 
             # get and parse the team info
+            print(link, flush=True)
             r = requests.get(base_url + link)
-            soup = BeautifulSoup(r)
-            for player in soup.findAll('td', 'infobody'):
-                file_out.write('\t'.join((player,
-                                         d['teams'][i],
-                                         d['leagues'][i],
-                                         d['seasons'][i])) 
-                               + '\n')
+            if r.status_code != 200:
+                continue
+
+            soup = BeautifulSoup(r.text)
+            for item in soup.findAll('td', 'infobody'):
+                player = item.get_text().strip()
+                if player:
+                    print(player, data['teams'][i], data['leagues'][i],
+                          data['seasons'][i], sep='\t', file=file_out)
  
 
 if __name__ == "__main__":
     """ use existing file """
-    d = parse_file_links("data/links.txt")
-    scrape_buda(d, "data/player_data.tsv")
+    data = parse_file_links("data/links.txt")
+    scrape_buda(data, "data/player_data.tsv")
+
 
 
