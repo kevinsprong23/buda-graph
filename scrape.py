@@ -76,7 +76,7 @@ def scrape_buda(data, file_name_out):
 if __name__ == "__main__":
     """ use existing file """
     data = parse_file_links("data/links.txt")
-    scrape_buda(data, "data/player_data.tsv")
+    scrape_buda(data, "data/roster_data.tsv")
 
 
 

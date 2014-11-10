@@ -29,10 +29,10 @@ def parse_line(line):
     return line.strip().split('\t')
 
 
-def process_team(this_team, nodes, file_out):
+def process_team(this_team, nodes, file_obj_out):
     """
     write all of the combinations of players in 
-    <this_team> as graph edges to <file_out>, 
+    <this_team> as graph edges to <file_obj_out>, 
     using the player_ids in <nodes>
     """
     for i, player_one in enumerate(this_team):
@@ -41,10 +41,10 @@ def process_team(this_team, nodes, file_out):
                 continue
             # write the source id and target id to file
             print(nodes[player_one], nodes[player_two],
-                  sep=',', file=file_out)
+                  sep=',', file=file_obj_out)
 
 
-def extract_nodes(file_name):
+def extract_nodes(file_name, file_name_out):
     """
     get a dictionary of player names mapped to
     unique ids
@@ -59,20 +59,20 @@ def extract_nodes(file_name):
                 nodes[player] = id
                 id += 1
 
-    with open('data/player_graph/nodes.csv', 'w') as file_out:
+    with open(file_name_out, 'w') as file_out:
         print('id,label', file=file_out)
         for player in nodes:
-            print(player, nodes[player], sep=',', file=file_out)
+            print(nodes[player], player, sep=',', file=file_out)
 
     return nodes
 
 
-def extract_edges(file_name, nodes):
+def extract_edges(file_name, file_name_out, nodes):
     """
     with a node list, extract edges of the form 
     source_id, target_id
     """
-    with open(file_name, 'r') as file_in, open('data/player_graph/raw_edges.csv', 'w') as file_out:
+    with open(file_name, 'r') as file_in, open(file_name_out, 'w') as file_out:
         print('source,target', file=file_out)
 
         # init the previous entry for comparison
@@ -103,9 +103,12 @@ if __name__ == '__main__':
     """
     get nodes, then edges for player-centric graph
     """
-    file_in = 'data/player_data.tsv'
-    nodes = extract_nodes(file_in)
-    extract_edges(file_in, nodes)
+    file_name_in = 'data/roster_data.tsv'
+    node_file_out = 'data/player_graph/nodes.csv'
+    edge_file_out = 'data/player_graph/raw_edges.csv'
+
+    nodes = extract_nodes(file_name_in, node_file_out)
+    extract_edges(file_name_in, edge_file_out, nodes)
 
 
 
