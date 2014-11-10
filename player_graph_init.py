@@ -99,7 +99,7 @@ if __name__ == '__main__':
     """
     get nodes, then edges for player-centric graph
     """
-    file_in = 'data/player_data_stub.tsv'
+    file_in = 'data/player_data.tsv'
     nodes = extract_nodes(file_in)
     extract_edges(file_in, nodes)
 
