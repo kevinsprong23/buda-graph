@@ -15,16 +15,16 @@ def parse_file_links(file_name):
         <a href="/hatleagues/rosters.php?section=showTeamRoster
             &team=2248&which=1093&season=1999">
             Team 5 (5)
-        </a> 
+        </a>
     </td>
-    
-    this method returns a dictionary of 
-    4 lists, all of same length: 
+
+    this method returns a dictionary of
+    4 lists, all of same length:
     1) the links themselves
     2) the team ids
     3) the league ids
     4) the seasons
-    
+
     """
 
     # variables to hold info about searched lines
@@ -43,7 +43,7 @@ def parse_file_links(file_name):
                 data['teams'].append(m.group(1))
                 data['leagues'].append(m.group(2))
                 data['seasons'].append(m.group(3))
-    
+
     return data
 
 def scrape_buda(data, file_name_out):
@@ -71,10 +71,10 @@ def scrape_buda(data, file_name_out):
                 if player:
                     print(player, data['teams'][i], data['leagues'][i],
                           data['seasons'][i], sep='\t', file=file_out)
- 
+
 
 if __name__ == "__main__":
-    """ use existing file """
+    # use links file
     data = parse_file_links("data/links.txt")
     scrape_buda(data, "data/roster_data.tsv")
 

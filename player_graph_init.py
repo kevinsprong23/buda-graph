@@ -7,8 +7,8 @@ from __future__ import print_function
 import re
 
 def format_name(name):
-    """ 
-    turn 
+    """
+    turn
     Sprong, Kevin
     into
     Kevin Sprong
@@ -22,7 +22,7 @@ def format_name(name):
 
 
 def parse_line(line):
-    """ 
+    """
     return player, team, league, season
     from a line of the player_data file
     """
@@ -31,8 +31,8 @@ def parse_line(line):
 
 def process_team(this_team, nodes, file_obj_out):
     """
-    write all of the combinations of players in 
-    <this_team> as graph edges to <file_obj_out>, 
+    write all of the combinations of players in
+    <this_team> as graph edges to <file_obj_out>,
     using the player_ids in <nodes>
     """
     for i, player_one in enumerate(this_team):
@@ -41,6 +41,7 @@ def process_team(this_team, nodes, file_obj_out):
                 continue
             # write the source id and target id to file
             print(nodes[player_one], nodes[player_two],
+                  player_one + " - " + player_two,
                   sep=',', file=file_obj_out)
 
 
@@ -51,13 +52,13 @@ def extract_nodes(file_name, file_name_out):
     """
     with open(file_name, 'r') as file_in:
         nodes = {}  # dict of player and unique id
-        id = 1
+        uid = 1
         for line in file_in:
             fields = parse_line(line)
             player = format_name(fields[0])
             if player not in nodes:
-                nodes[player] = id
-                id += 1
+                nodes[player] = uid
+                uid += 1
 
     with open(file_name_out, 'w') as file_out:
         print('id,label', file=file_out)
@@ -69,20 +70,20 @@ def extract_nodes(file_name, file_name_out):
 
 def extract_edges(file_name, file_name_out, nodes):
     """
-    with a node list, extract edges of the form 
+    with a node list, extract edges of the form
     source_id, target_id
     """
     with open(file_name, 'r') as file_in, open(file_name_out, 'w') as file_out:
-        print('source,target', file=file_out)
+        print('source,target,label', file=file_out)
 
         # init the previous entry for comparison
-        last_player, last_team, last_league, last_season = (None, None, 
+        last_player, last_team, last_league, last_season = (None, None,
                                                             None, None)
         this_team = []
         for line in file_in:
             player, team, league, season = parse_line(line)
             player = format_name(player)
-            if last_player is None or (team == last_team and 
+            if last_player is None or (team == last_team and
                 league == last_league and season == last_season):
                 this_team.append(player)
             else:  # new player
@@ -93,16 +94,15 @@ def extract_edges(file_name, file_name_out, nodes):
                 this_team = []
                 this_team.append(player)
 
-            last_player, last_team, last_league, last_season = player, team, league, season
+            last_player, last_team, last_league, last_season = (player,
+                team, league, season)
 
         # there is one last team to process
         process_team(this_team, nodes, file_out)
 
 
 if __name__ == '__main__':
-    """
-    get nodes, then edges for player-centric graph
-    """
+    # get nodes, then edges for player-centric graph
     file_name_in = 'data/roster_data.tsv'
     node_file_out = 'data/player_graph/nodes.csv'
     edge_file_out = 'data/player_graph/raw_edges.csv'
