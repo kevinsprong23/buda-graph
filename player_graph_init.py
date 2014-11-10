@@ -5,6 +5,7 @@ of distinct player names
 
 from __future__ import print_function
 import re
+import unicodedata
 
 def format_name(name):
     """
@@ -12,10 +13,16 @@ def format_name(name):
     Sprong, Kevin
     into
     Kevin Sprong
+    also strip out any crazy unicode stuff
     """
-    m = re.search(r"(.*),\s(.*)", name)
-    if m:
-        return m.group(2) + " " + m.group(1)
+    name_match = re.search(r"(.*),\s(.*)", name)
+    if name_match:
+        name = name_match.group(2) + " " + name_match.group(1)
+        normed_name = (unicodedata.normalize('NFKD', name)
+                   .encode('ascii', 'ignore')
+                   .decode('utf-8'))
+        # now get rid of commas
+        return re.sub(r",", "", normed_name)
     else:
         print(name)
         quit()
@@ -37,12 +44,11 @@ def process_team(this_team, nodes, file_obj_out):
     """
     for i, player_one in enumerate(this_team):
         for j, player_two in enumerate(this_team):
-            if j <= i:
-                continue
-            # write the source id and target id to file
-            print(nodes[player_one], nodes[player_two],
-                  player_one + " - " + player_two,
-                  sep=',', file=file_obj_out)
+            if j > i and nodes[player_one] != nodes[player_two]:
+                # write the source id and target id to file
+                print(nodes[player_one], nodes[player_two],
+                      player_one + " - " + player_two,
+                      sep=',', file=file_obj_out)
 
 
 def extract_nodes(file_name, file_name_out):
