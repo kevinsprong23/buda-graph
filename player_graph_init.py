@@ -14,7 +14,11 @@ def format_name(name):
     Kevin Sprong
     """
     m = re.search(r"(.*),\s(.*)", name)
-    return m.group(2) + " " + m.group(1)
+    if m:
+        return m.group(2) + " " + m.group(1)
+    else:
+        print(name)
+        quit()
 
 
 def parse_line(line):

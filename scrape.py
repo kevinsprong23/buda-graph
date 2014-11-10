@@ -49,6 +49,7 @@ def parse_file_links(file_name):
 def scrape_buda(data, file_name_out):
     """
     data is the dict of links, teams, leagues, seasons
+    TODO HANDLE THE TEAMS THAT MIGHT DIVIDE ROSTERS OVER TWO PAGES
     """
 
     # get the player names, and put them in a .tsv file with team/league info
