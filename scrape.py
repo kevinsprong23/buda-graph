@@ -9,7 +9,7 @@ from time import sleep
 
 def parse_file_links(file_name):
     """
-    each line of file_name looks like:
+    each line of file_name looks like (without the newlines):
 
     </tr><tr><td class=infobody colspan=1>
         <a href="/hatleagues/rosters.php?section=showTeamRoster
@@ -45,6 +45,7 @@ def parse_file_links(file_name):
                 data['seasons'].append(m.group(3))
 
     return data
+
 
 def scrape_buda(data, file_name_out):
     """

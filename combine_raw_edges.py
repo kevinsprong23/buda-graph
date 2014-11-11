@@ -18,6 +18,7 @@ def combine_raw_edges(file_name, file_name_out):
     and combine by number of occurences overall
     """
     with open(file_name, 'r') as file_in:
+        next(file_in)  # skip header row
         edges = defaultdict(one)
         for line in file_in:
             edges[line.strip()] += 1

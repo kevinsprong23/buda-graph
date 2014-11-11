@@ -1,2 +1,3 @@
 data/*_graph/**
 analysis/**
+__pycache__
