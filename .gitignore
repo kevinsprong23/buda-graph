@@ -1,3 +1,4 @@
 data/*_graph/**
 gephi/**
+analyze/results/**
 __pycache__

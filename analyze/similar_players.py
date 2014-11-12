@@ -72,9 +72,6 @@ def find_missing_edges(player_id, adj_mat, num_to_find=10, node_thresh=1):
 
             player_two_vec = adj_mat[uid2 - 1]
 
-            if sum(player_two_vec) <= node_thresh:
-                continue
-
             sim = (jaccard_similarity(player_one_vec, player_two_vec) +
                    cosine_similarity(player_one_vec, player_two_vec))
 
