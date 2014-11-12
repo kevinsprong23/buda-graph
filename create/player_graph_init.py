@@ -108,9 +108,9 @@ def extract_edges(file_name, file_name_out, nodes):
 
 if __name__ == '__main__':
     # get nodes, then edges for player-centric graph
-    file_name_in = 'data/roster_data.tsv'
-    node_file_out = 'data/player_graph/nodes.csv'
-    edge_file_out = 'data/player_graph/raw_edges.csv'
+    file_name_in = '../data/roster_data.tsv'
+    node_file_out = '../data/player_graph/nodes.csv'
+    edge_file_out = '../data/player_graph/raw_edges.csv'
 
     nodes = extract_nodes(file_name_in, node_file_out)
     extract_edges(file_name_in, edge_file_out, nodes)

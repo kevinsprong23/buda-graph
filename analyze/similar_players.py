@@ -98,7 +98,7 @@ def update_results(result, results_list):
 if __name__ == "__main__":
     # read in nodes as dict of id : name
     nodes = {}
-    with open('data/player_graph/nodes.csv', 'r') as file_in:
+    with open('../data/player_graph/nodes.csv', 'r') as file_in:
         next(file_in)  # skip header row
         for line in file_in:
             player_id, label = line.strip().split(',')
@@ -106,7 +106,7 @@ if __name__ == "__main__":
 
     # read in edges as dict of (src,tgt),weight
     edges = {}
-    with open('data/player_graph/edges.csv', 'r') as file_in:
+    with open('../data/player_graph/edges.csv', 'r') as file_in:
         next(file_in)  # skip header row
         for line in file_in:
             src, tgt, lbl, wgt, typ = line.strip().split(',')
@@ -134,7 +134,7 @@ if __name__ == "__main__":
     pool.join()
 
     # write results to file
-    with open('analysis/similarity_results.csv', 'w') as file_out:
+    with open('results/similarity_results.csv', 'w') as file_out:
         for result in similarity_results:
             if not result:
                 continue

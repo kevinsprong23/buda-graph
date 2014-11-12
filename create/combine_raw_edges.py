@@ -30,7 +30,7 @@ def combine_raw_edges(file_name, file_name_out):
                   sep=',', file=file_out)
 
 if __name__ == '__main__':
-    file_name_in = 'data/player_graph/raw_edges.csv'
-    file_name_out = 'data/player_graph/edges.csv'
+    file_name_in = '../data/player_graph/raw_edges.csv'
+    file_name_out = '../data/player_graph/edges.csv'
 
     combine_raw_edges(file_name_in, file_name_out)
