@@ -2,68 +2,16 @@
 find similar players using jaccard similarity
 and cosine similarity
 
-the 12k by 12k adjacency matrix does not fit
-in memory on my machine, so I am doing it player by player.
-This leads to a LOT of wasted edge list traversals.
-Should optimize this by figuring out the largest
-subgraph that can fit in memory
+use multiprocessing because n^3 comparison
+of each player to every other is very slow
+
 """
 
 import math
 from operator import itemgetter
-
-def find_edge(edges, player_one, player_two):
-    """
-    find an edge between two players if it exists
-    exploits the fact that edges are unique, i.e. will not have
-    both A-B and B-A in the edge file, so can return upon first
-    match
-    """
-    if (player_one, player_two) in edges:
-        return edges[(player_one, player_two)]
-    elif (player_two, player_one) in edges:
-        return edges[(player_two, player_one)]
-
-    return 0
-
-
-def build_adjacency_vector(nodes, edges, player_id):
-    """
-    build player_id row in the adjacency matrix
-    and return it as a list
-    """
-    num_nodes = len(nodes)
-    # build the adjacency matrix entries for player one and player two
-    adjacency_vec = []
-    for i in range(1, num_nodes):  # since we know uids are 1:num_nodes
-        adjacency_vec.append(find_edge(edges, player_id, i))
-
-    return adjacency_vec
-
-
-def build_adjacency_matrix(nodes, edges):
-    """
-    build the full adjacency matrix for the undirected graph
-    defined by the edge list in edges
-    
-    nodes is the node list, and is only used for matrix sizing
-    edges has tuple of integer keys for source/target, and weight values
-    """
-    num_nodes = len(nodes)
-
-    # init the matrix - this would be easier with numpy
-    adj_mat = [0 for n in range(num_nodes)]
-    for i in range(num_nodes):
-        adj_mat[i] = [0 for n in range(num_nodes)]
-
-    # loop over edges and assign to matrix
-    for key, weight in edges.items():
-        src, tgt = key
-        adj_mat[src-1][tgt-1] = weight
-        adj_mat[tgt-1][src-1] = weight
-        
-    return adj_mat
-
+from functools import partial
+from multiprocessing import Pool, cpu_count
+from graph_functions import build_adjacency_matrix
 
 def jaccard_similarity(vector_one, vector_two):
     """
@@ -95,42 +43,31 @@ def cosine_similarity(vector_one, vector_two):
     return dot(vector_one, vector_two) / (vec_one_norm * vec_two_norm)
 
 
-def find_missing_edges(adj_mat, player_id=None, num_to_find=50, node_thresh=1):
+def find_missing_edges(player_id, adj_mat, num_to_find=10, node_thresh=1):
     """
     find the most similar players that haven't played together
 
     adj_mat is the adjacency matrix, element ij is the weight between
     nodes with id i+1 and j+1 (because matrices are zero-indexed)
 
-    player_id is a specific player id to limit the recommendations to
-    num_to_find is the number of missing edges to track
-    node_thresh filters on node weighted degree - dont search small nodes
+    player_id is a specific player id to find recommendations for
+    num_to_find is the number of recommendations to make
+    node_thresh filters on node weighted degree - i.e. dont search small nodes
 
     returns NODE IDs (not matrix indices) and similarity scores
     """
+    N = len(adj_mat)
+    uid = player_id
+
     # tuples of uid1,uid2,similarity
-    missing_edges = [(-1, -2, float('-inf')) for n in range(num_to_find)]
+    missing_edges = [(uid, uid, float('-inf')) for n in range(num_to_find)]
 
-    N = len(nodes)
-    if player_id:
-        ids_to_search = range(player_id, player_id+1)
-    else:
-        ids_to_search = range(1, N+1)
+    player_one_vec = adj_mat[uid - 1]
 
-    # player uids range from 1 to N
-    for uid in ids_to_search:  # to second-to-last index
-        print("Searching player {0}".format(uid), flush=True)
-
-        player_one_vec = adj_mat[uid - 1] 
-
-        if sum(player_one_vec) <= node_thresh:
-            continue
-
-        ids_to_compare = range(1, N+1) if player_id else range(uid+1, N+1)
-
-        for uid2 in ids_to_compare:  # to last index
+    if sum(player_one_vec) >= node_thresh:
+        for uid2 in range(1, N+1):
             # only want unconnected players
-            if adj_mat[uid - 1][uid2 - 1] or uid == uid2:
+            if player_one_vec[uid2 - 1] or uid == uid2:
                 continue
 
             player_two_vec = adj_mat[uid2 - 1]
@@ -146,7 +83,16 @@ def find_missing_edges(adj_mat, player_id=None, num_to_find=50, node_thresh=1):
                 missing_edges[-1] = (uid, uid2, sim)
                 missing_edges.sort(key=itemgetter(2), reverse=True)
 
-    return missing_edges
+        return missing_edges
+
+
+def update_results(result, results_list):
+    """
+    put result in list
+    only main process will access this
+    """
+    results_list.append(result)
+    print(len(results_list), flush=True)
 
 
 if __name__ == "__main__":
@@ -166,11 +112,35 @@ if __name__ == "__main__":
             src, tgt, lbl, wgt, typ = line.strip().split(',')
             edges[(int(src), int(tgt))] = int(wgt)
 
+    # player graph as adjacency matrix
     adj_mat = build_adjacency_matrix(nodes, edges)
-    similar_players = find_missing_edges(adj_mat, node_thresh=50)
 
-    for uid, uid2, sim in similar_players:
-        print(nodes[uid], nodes[uid2], sim, sep=', ')
+    players_to_process = [9202, 8473, 4352]
+
+    # multiprocessing to process adjacency matrix
+    similarity_results = []  # shared output structure
+    update_results_partial = partial(update_results, 
+                                     results_list=similarity_results)
+    
+    pool = Pool(processes=(cpu_count() - 1))
+    for uid in players_to_process:
+        # call missing edge function asynchronously, and 
+        # have main process update results when done
+        pool.apply_async(find_missing_edges, args=(uid, adj_mat,),
+                         kwds=dict(num_to_find=10, node_thresh=1),
+                         callback=update_results_partial)
+
+    pool.close()
+    pool.join()
+
+    # write results to file
+    with open('analysis/similarity_results.csv', 'w') as file_out:
+        for result in similarity_results:
+            if not result:
+                continue
+            for (uid, uid2, sim) in result:
+                print(nodes[uid], nodes[uid2], round(sim, 2),
+                      sep=',', file=file_out)
 
 
 

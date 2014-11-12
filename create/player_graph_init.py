@@ -3,7 +3,6 @@ from player_data.tsv, get the list
 of distinct player names
 """
 
-from __future__ import print_function
 import re
 import unicodedata
 
