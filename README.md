@@ -1,7 +1,11 @@
 Analysis of the BUDA Social Graph
 =================================
 
-repository for analysis of [BUDA](http://buda.org) players when considered as a social graph
+Repository for analysis of [BUDA](http://buda.org) players when considered as a social graph
+
+A note: I used python 3.3 for this, and made no effort towards python 2.x compatibility. Sorry.
+
+Dependencies: matplotlib, and my own set of helper plotting functions [aperture](https://github.com/kevinsprong23/aperture), but that's only for the network_statistics.py script and the plots are omittable if dependencies annoy you.
 
 STEPS TO RUN
 ============

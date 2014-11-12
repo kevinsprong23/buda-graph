@@ -8,9 +8,9 @@ A and B should always show up as A-B
 
 from collections import defaultdict
 
-def one():
+def zero():
     """ function for defaultdict """
-    return 1
+    return 0
 
 def combine_raw_edges(file_name, file_name_out):
     """
@@ -19,7 +19,7 @@ def combine_raw_edges(file_name, file_name_out):
     """
     with open(file_name, 'r') as file_in:
         next(file_in)  # skip header row
-        edges = defaultdict(one)
+        edges = defaultdict(zero)
         for line in file_in:
             edges[line.strip()] += 1
 
