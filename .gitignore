@@ -1,4 +1,5 @@
 data/*_graph/**
 gephi/**
 analyze/results/**
-__pycache__
+**/__pycache__/**
+**/*.swp
