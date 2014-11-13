@@ -5,15 +5,9 @@ edge_weight
 """
 
 import math
-from collections import defaultdict
 from graph_functions import build_adjacency_matrix
 import aperture as ap
 import matplotlib.pyplot as plt
-
-def zero():
-    """ func for default dict """
-    return 0
-
 
 def mean(x):
     if not x: 
