@@ -30,7 +30,7 @@ if __name__ == "__main__":
 
     year_thresh = 2013
 
-    output_file_name = '../data/player_graph/node_ids_since_' 
+    output_file_name = '../data/player_graph/node_ids_since_'
     output_file_name += str(year_thresh)
     output_file_name += '.txt'
 
