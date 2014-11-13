@@ -54,3 +54,29 @@ def build_adjacency_matrix(nodes, edges):
         adj_mat[tgt-1][src-1] = weight
 
     return adj_mat
+
+
+def load_adjacency_matrix(node_file_name, edge_file_name):
+    """ wrapper for build_adjacency_matrix.  also return nodes """
+    # read in nodes as dict of id : name
+    nodes = {}
+    with open(node_file_name, 'r') as file_in:
+        next(file_in)  # skip header row
+        for line in file_in:
+            player_id, label = line.strip().split(',')
+            nodes[int(player_id)] = label
+
+    # read in edges as dict of (src,tgt),weight
+    edges = {}
+    with open(edge_file_name, 'r') as file_in:
+        next(file_in)  # skip header row
+        for line in file_in:
+            src, tgt, lbl, wgt, typ = line.strip().split(',')
+            edges[(int(src), int(tgt))] = int(wgt)
+
+    # player graph as adjacency matrix
+    adj_mat = build_adjacency_matrix(nodes, edges)
+    return adj_mat, nodes
+
+
+

@@ -4,13 +4,13 @@ distributions of node degree, weighted degree,
 edge_weight
 """
 
-import math
-from graph_functions import build_adjacency_matrix
+from graph_functions import load_adjacency_matrix
 import aperture as ap
 import matplotlib.pyplot as plt
 
 def mean(x):
-    if not x: 
+    """ mean of an array-like """
+    if not x:
         return None
     tot = 0
     co = 0
@@ -57,24 +57,12 @@ def calc_mean_edge_weight(adj_mat):
 
 
 if __name__ == "__main__":
-    # read in nodes as dict of id : name
-    nodes = {}
-    with open('../data/player_graph/nodes.csv', 'r') as file_in:
-        next(file_in)  # skip header row
-        for line in file_in:
-            player_id, label = line.strip().split(',')
-            nodes[int(player_id)] = label
-
-    # read in edges as dict of (src,tgt) : weight
-    edges = {}
-    with open('../data/player_graph/edges.csv', 'r') as file_in:
-        next(file_in)  # skip header row
-        for line in file_in:
-            src, tgt, lbl, wgt, typ = line.strip().split(',')
-            edges[(int(src), int(tgt))] = int(wgt)
+    node_file_path = '../data/player_graph/nodes.csv'
+    edge_file_path = '../data/player_graph/edges.csv'
 
     # player graph as adjacency matrix
-    adj_mat = build_adjacency_matrix(nodes, edges)
+    adj_mat, nodes = load_adjacency_matrix(node_file_path,
+                                           edge_file_path)
 
     # basic analytics
     node_degrees = calc_node_degree(adj_mat)
@@ -88,7 +76,7 @@ if __name__ == "__main__":
     plt.xlabel('Node degree')
     plt.ylabel('Mean edge weight')
     plt.savefig('results/node_deg_vs_edge_weight.png')
-    
+
     # plot node degree hist
     fig = plt.figure()
     plt.hist(node_degrees, bins=range(1000), log=False,
