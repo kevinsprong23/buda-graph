@@ -113,7 +113,7 @@ if __name__ == "__main__":
     # parallel generation of results
     util.log_to_stderr(util.SUBDEBUG)
     n_cores = cpu_count()
-    chunksize = max(1, len(nodes_to_process) // (2 * (n_cores-1)))
+    chunksize = max(1, len(nodes_to_process) // (2 * (n_cores - 1)))
 
     pool = Pool(processes=(n_cores - 1))
     similarity_results = pool.imap(find_edges_partial,
@@ -121,7 +121,7 @@ if __name__ == "__main__":
                                    chunksize=chunksize)
 
     # write results to file
-    with open('results/similarity_results.csv', 'a') as file_out:
+    with open('results/similarity_results.csv', 'w') as file_out:
         for result in similarity_results:
             if not result:
                 continue
