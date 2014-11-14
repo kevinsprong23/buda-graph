@@ -9,11 +9,29 @@ of each node to every other is very slow
 
 import math
 import numpy as np
+import ctypes
 from operator import itemgetter
 from functools import partial
 from multiprocessing import Pool, cpu_count
 import multiprocessing.util as util
-from graph_functions import load_adjacency_matrix
+from graph_functions import load_adj_mat_multiproc
+
+#==============================================================================
+# Global variable shenanigans to get numpy to play nice with multiprocessing
+node_file_path = '../data/player_graph/nodes.csv'
+edge_file_path = '../data/player_graph/edges.csv'
+candidate_file_path = '../data/player_graph/node_ids_since_2013.txt'
+
+# adjacency matrix and dict of node id/label
+adj_mat_base, adj_mat, nodes = load_adj_mat_multiproc(node_file_path,
+                                                      edge_file_path)
+
+# node IDs range from 1 to the number of nodes
+nodes_to_process = []
+with open(candidate_file_path) as cand_file:
+    for line in cand_file:
+        nodes_to_process.append(int(line))
+#==============================================================================
 
 
 def jaccard_similarity(vector_one, vector_two):
@@ -36,7 +54,7 @@ def cosine_similarity(vector_one, vector_two):
     return np.dot(vector_one, vector_two) / max(1, vec_one_norm * vec_two_norm)
 
 
-def find_missing_edges(node_id, candidate_ids, adj_mat, 
+def find_missing_edges(node_id, candidate_ids=nodes_to_process, adj_mat=adj_mat, 
                        num_to_find=10, node_thresh=1):
     """
     find the most similar nodes that don't share an edge with node_id
@@ -82,35 +100,13 @@ def find_missing_edges(node_id, candidate_ids, adj_mat,
 
 
 if __name__ == "__main__":
-    node_file_path = '../data/player_graph/nodes.csv'
-    edge_file_path = '../data/player_graph/edges.csv'
-    candidate_file_path = '../data/player_graph/node_ids_since_2013.txt'
-
-    # adjacency matrix and dict of node id/label
-    adj_mat, nodes = load_adjacency_matrix(node_file_path,
-                                           edge_file_path)
-
-    # node IDs range from 1 to the number of nodes
-    nodes_to_process = []
-    with open(candidate_file_path) as cand_file:
-        for line in cand_file:
-            nodes_to_process.append(int(line))
-
-    # partial function to apply in parallel
-    find_edges_partial = partial(find_missing_edges,
-                                 candidate_ids=nodes_to_process,
-                                 adj_mat=adj_mat,
-                                 num_to_find=10, node_thresh=1)
-
-    nodes_to_process = [10208, 9202, 9201]
-
     # parallel generation of results
     util.log_to_stderr(util.SUBDEBUG)
     n_cores = cpu_count()
     chunksize = max(1, len(nodes_to_process) // (2 * (n_cores - 1)))
 
     pool = Pool(processes=(n_cores - 1))
-    similarity_results = pool.imap(find_edges_partial,
+    similarity_results = pool.imap(find_missing_edges,
                                    nodes_to_process,
                                    chunksize=chunksize)
 
