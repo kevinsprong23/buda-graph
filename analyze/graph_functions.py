@@ -2,6 +2,7 @@
 helper modules to compute and manipulate graph
 networks
 """
+import numpy as np
 
 def find_edge(edges, player_one, player_two):
     """
@@ -42,16 +43,14 @@ def build_adjacency_matrix(nodes, edges):
     """
     num_nodes = len(nodes)
 
-    # init the matrix - this would be easier with numpy
-    adj_mat = [0 for n in range(num_nodes)]
-    for i in range(num_nodes):
-        adj_mat[i] = [0 for n in range(num_nodes)]
+    # init the matrix
+    adj_mat = np.zeros((num_nodes, num_nodes), dtype=np.int)
 
     # loop over edges and assign to matrix
     for key, weight in edges.items():
         src, tgt = key
-        adj_mat[src-1][tgt-1] = weight
-        adj_mat[tgt-1][src-1] = weight
+        adj_mat[src-1, tgt-1] = weight
+        adj_mat[tgt-1, src-1] = weight
 
     return adj_mat
 

@@ -4,37 +4,19 @@ distributions of node degree, weighted degree,
 edge_weight
 """
 
+import numpy as np
 from graph_functions import load_adjacency_matrix
 import aperture as ap
 import matplotlib.pyplot as plt
 
-def mean(x):
-    """ mean of an array-like """
-    if not x:
-        return None
-    tot = 0
-    co = 0
-    for val in x:
-        tot += val
-        co += 1
-    if co == 0:
-        return 0
-    return float(tot) / co
-
 def calc_node_degree(adj_mat):
     """ return a list of each node's degree """
-    node_deg = [0] * len(adj_mat)
-    for i, row in enumerate(adj_mat):
-        node_deg[i] = sum((1 for x in row if x > 0))
-    return node_deg
+    return np.apply_along_axis(lambda x: len(x[x > 0]), 1, adj_mat)
 
 
 def calc_weighted_node_degree(adj_mat):
     """ return a list of each node's WEIGHTED degree """
-    w_node_deg = [0] * len(adj_mat)
-    for i, row in enumerate(adj_mat):
-        w_node_deg[i] = sum((x for x in row if x > 0))
-    return w_node_deg
+    return np.sum(adj_mat, axis=1)
 
 
 def get_edge_weight_list(adj_mat):
@@ -48,12 +30,14 @@ def get_edge_weight_list(adj_mat):
     return edge_weights
 
 
+def mean_pos_edge_weight(array):
+    """ return mean of the positive elements of array """    
+    return np.mean(array[array > 0]) if any(array) else 0
+
+
 def calc_mean_edge_weight(adj_mat):
     """ return a list of each node's mean positive edge weight """
-    mean_weight = [0] * len(adj_mat)
-    for i, row in enumerate(adj_mat):
-        mean_weight[i] = mean((x for x in row if x > 0))
-    return mean_weight
+    return np.apply_along_axis(mean_pos_edge_weight, 1, adj_mat)
 
 
 if __name__ == "__main__":

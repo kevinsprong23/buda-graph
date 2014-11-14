@@ -8,6 +8,7 @@ of each node to every other is very slow
 """
 
 import math
+import numpy as np
 from operator import itemgetter
 from functools import partial
 from multiprocessing import Pool, cpu_count
@@ -26,23 +27,13 @@ def jaccard_similarity(vector_one, vector_two):
     return sum(vec_min) / max(1, sum(vec_max))  # prevent div by zero
 
 
-def norm(vec):
-    """ L2 norm """
-    return math.sqrt(sum((x ** 2 for x in vec)))
-
-
-def dot(vec_one, vec_two):
-    """ reimplement to avoid numpy dependency """
-    return sum((a * b for a, b in zip(vec_one, vec_two)))
-
-
 def cosine_similarity(vector_one, vector_two):
     """
     cosine similarity between two vectors
     """
-    vec_one_norm = max(1, norm(vector_one))
-    vec_two_norm = max(1, norm(vector_two))
-    return dot(vector_one, vector_two) / max(1, vec_one_norm * vec_two_norm)
+    vec_one_norm = max(1, np.linalg.norm(vector_one))
+    vec_two_norm = max(1, np.linalg.norm(vector_two))
+    return np.dot(vector_one, vector_two) / max(1, vec_one_norm * vec_two_norm)
 
 
 def find_missing_edges(node_id, candidate_ids, adj_mat, 
@@ -52,7 +43,8 @@ def find_missing_edges(node_id, candidate_ids, adj_mat,
 
     candidate_ids is a list of node ids which we want to recommend for
 
-    adj_mat is the adjacency matrix, element ij is the weight between
+    adj_mat is the adjacency matrix as a numpy array,
+        element ij is the weight between
     nodes with id i+1 and j+1 (because matrices are zero-indexed)
 
     node_id is a specific node id to find recommendations for
@@ -67,7 +59,7 @@ def find_missing_edges(node_id, candidate_ids, adj_mat,
     # tuples of uid1,uid2,similarity
     missing_edges = None
 
-    node_one_vec = adj_mat[uid - 1]
+    node_one_vec = adj_mat[uid - 1, :]
 
     if sum(node_one_vec) >= node_thresh:
         missing_edges = [(uid, uid, float('-inf')) for n in range(num_to_find)]
@@ -76,7 +68,7 @@ def find_missing_edges(node_id, candidate_ids, adj_mat,
             if node_one_vec[uid2 - 1] or uid == uid2:
                 continue
 
-            node_two_vec = adj_mat[uid2 - 1]
+            node_two_vec = adj_mat[uid2 - 1, :]
 
             sim = (jaccard_similarity(node_one_vec, node_two_vec) +
                    cosine_similarity(node_one_vec, node_two_vec))
@@ -109,6 +101,8 @@ if __name__ == "__main__":
                                  candidate_ids=nodes_to_process,
                                  adj_mat=adj_mat,
                                  num_to_find=10, node_thresh=1)
+
+    nodes_to_process = [10208, 9202, 9201]
 
     # parallel generation of results
     util.log_to_stderr(util.SUBDEBUG)
