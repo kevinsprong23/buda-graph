@@ -59,6 +59,13 @@ if __name__ == "__main__":
     plt.plot(weighted_node_degrees, mean_edge_weights, '.', alpha=0.05)
     plt.xlabel('Weighted node degree')
     plt.ylabel('Mean edge weight')
+    plt.savefig('results/wgt_node_deg_vs_edge_weight.png')
+
+    # plot node degree versus edge weight
+    plt.figure()
+    plt.plot(node_degrees, mean_edge_weights, '.', alpha=0.05)
+    plt.xlabel('Node degree')
+    plt.ylabel('Mean edge weight')
     plt.savefig('results/node_deg_vs_edge_weight.png')
 
     # plot node degree hist
