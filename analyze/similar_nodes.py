@@ -54,7 +54,7 @@ def cosine_similarity(vector_one, vector_two):
     return np.dot(vector_one, vector_two) / max(1, vec_one_norm * vec_two_norm)
 
 
-def find_missing_edges(node_id, candidate_ids=nodes_for comparison,
+def find_missing_edges(node_id, candidate_ids=nodes_for_comparison,
                        adj_mat=adj_mat, num_to_find=10, node_thresh=1):
     """
     find the most similar nodes that don't share an edge with node_id
@@ -107,7 +107,7 @@ if __name__ == "__main__":
             processed_ids.add(int(line))
 
     # process the rest
-    nodes_to_process = (x for x in nodes_for_comparison if x not in processed_ids)
+    nodes_to_process = [x for x in nodes_for_comparison if x not in processed_ids]
 
     # parallel generation of results
     util.log_to_stderr(util.SUBDEBUG)
