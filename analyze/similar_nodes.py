@@ -27,10 +27,10 @@ adj_mat_base, adj_mat, nodes = load_adj_mat_multiproc(node_file_path,
                                                       edge_file_path)
 
 # node IDs range from 1 to the number of nodes
-nodes_to_process = []
+nodes_for_comparison = []
 with open(candidate_file_path) as cand_file:
     for line in cand_file:
-        nodes_to_process.append(int(line))
+        nodes_for_comparison.append(int(line))
 #==============================================================================
 
 
@@ -54,8 +54,8 @@ def cosine_similarity(vector_one, vector_two):
     return np.dot(vector_one, vector_two) / max(1, vec_one_norm * vec_two_norm)
 
 
-def find_missing_edges(node_id, candidate_ids=nodes_to_process, adj_mat=adj_mat, 
-                       num_to_find=10, node_thresh=1):
+def find_missing_edges(node_id, candidate_ids=nodes_for comparison,
+                       adj_mat=adj_mat, num_to_find=10, node_thresh=1):
     """
     find the most similar nodes that don't share an edge with node_id
 
@@ -100,24 +100,38 @@ def find_missing_edges(node_id, candidate_ids=nodes_to_process, adj_mat=adj_mat,
 
 
 if __name__ == "__main__":
+    # load node id's that we have already processed
+    processed_ids = set()
+    with open('results/processed_similarity_ids.txt') as file_in:
+        for line in file_in:
+            processed_ids.add(int(line))
+
+    # process the rest
+    nodes_to_process = (x for x in nodes_for_comparison if x not in processed_ids)
+
     # parallel generation of results
     util.log_to_stderr(util.SUBDEBUG)
     n_cores = cpu_count()
     chunksize = max(1, len(nodes_to_process) // (2 * (n_cores - 1)))
 
+    
     pool = Pool(processes=(n_cores - 1))
     similarity_results = pool.imap(find_missing_edges,
                                    nodes_to_process,
                                    chunksize=chunksize)
 
     # write results to file
-    with open('results/similarity_results.csv', 'w') as file_out:
+    with open('results/similarity_results.csv', 'a') as file_out, \
+         open('results/processed_similarity_ids.txt', 'a') as processed:
         for result in similarity_results:
             if not result:
                 continue
+            # write the result
             for (uid, uid2, sim) in result:
                 print(nodes[uid], nodes[uid2], round(sim, 2),
                       sep=',', file=file_out)
+            # log that we have another result
+            print(uid, file=processed)
 
     pool.close()
     pool.join()
