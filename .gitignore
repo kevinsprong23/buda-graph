@@ -3,3 +3,4 @@ gephi/**
 analyze/results/**
 **/__pycache__/**
 **/*.swp
+tmp/
