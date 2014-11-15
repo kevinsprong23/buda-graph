@@ -30,7 +30,7 @@ if __name__ == "__main__":
         pid = nodes[player]
         jsonified_results.append({'id': pid, 'list': j})
         jsonified_nodes.append({'id': pid, 'label': player})
-    
+
     # save
     with open('similarities.json', 'w') as file_out, \
          open('nodes.json', 'w') as node_file_out:

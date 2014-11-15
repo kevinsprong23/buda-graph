@@ -1,4 +1,4 @@
-""" 
+"""
 print the N most similar players from the
 similarity results file
 """
@@ -21,6 +21,6 @@ if __name__ == "__main__":
                         key=itemgetter(1),
                         reverse=True)
     for i in range(num_to_print):
-        print(sorted_sim[i][0][0], sorted_sim[i][0][1], 
-              sorted_sim[i][1], sep=',')        
+        print(sorted_sim[i][0][0], sorted_sim[i][0][1],
+              sorted_sim[i][1], sep=',')
 
