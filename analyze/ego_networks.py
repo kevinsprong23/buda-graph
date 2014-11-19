@@ -29,6 +29,7 @@ nodes_for_comparison = []
 with open(candidate_file_path) as cand_file:
     for line in cand_file:
         nodes_for_comparison.append(int(line))
+nodes_for_comparison = nodes_for_comparison[0:10]
 #==============================================================================
 
 def calc_ego_network_sizes(node_id, max_k=6, adj_mat=adj_mat):
@@ -88,6 +89,7 @@ if __name__ == "__main__":
                                    chunksize=chunksize)
 
     # write results to file
+    sample_size = len(nodes)
     with open('results/ego_results.csv', 'a') as file_out, \
          open('results/processed_ego_ids.txt', 'a') as processed:
         for result in ego_results:
@@ -95,7 +97,7 @@ if __name__ == "__main__":
                 continue
             # write the result
             for (uid, ego_degree, num_nodes) in result:
-                print(uid, ego_degree, num_nodes,
+                print(uid, ego_degree, round(num_nodes / sample_size, 4),
                       sep=',', file=file_out)
             # log that we have another result
             print(uid, file=processed)
