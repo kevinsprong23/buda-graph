@@ -102,9 +102,12 @@ def find_missing_edges(node_id, candidate_ids=nodes_for_comparison,
 if __name__ == "__main__":
     # load node id's that we have already processed
     processed_ids = set()
-    with open('results/processed_similarity_ids.txt') as file_in:
-        for line in file_in:
-            processed_ids.add(int(line))
+    try:
+        with open('results/processed_similarity_ids.txt') as file_in:
+            for line in file_in:
+                processed_ids.add(int(line))
+    except:
+        pass
 
     # process the rest
     nodes_to_process = [x for x in nodes_for_comparison if x not in processed_ids]
