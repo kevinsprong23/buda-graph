@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<body>
+  <!-- inline for easy copy/paste into markdown blogpost -->
+  <style>
+    html, body {
+      font-family: Arial;
+      background: #f7f7f5;
+      color: #777;
+    }
+    
+    #app-container {
+      padding: 50px;
+    }
+
+    #list, .list-entry {
+      display: block;
+    }
+
+    .list-entry {
+      position: relative;
+      width: 300px;
+      padding: 5px; 0px 5px 0px;
+    }
+
+    .sim-score {
+      display: inline-block;
+      position: absolute;
+      right: 10px;
+    }
+  </style>
+  
+  <div ng-app="BudaApp" ng-controller="playerController" id="app-container">
+    <h3>People you may know: BUDA edition</h3>
+    <input type="text" ng-model="nameFilter" placeholder="Enter player name..."/>
+    <div id="list" ng-repeat="player in playerList | filter: searchFilter">
+      <p>Strongest missing edges for {{player.id}}: </p>
+      <div class="list-entry" ng-repeat="sim in player.list">
+        {{sim.n}} <div class="sim-score">{{ sim.s }}</div>
+      </div>
+    </div>
+  </div>
+  <script src="http://kevinsprong.com/scripts/angular.min.js"></script>
+  <script src="app.js"></script>
+  <script src="controllers.js"></script>
+</body>
+</html>
+
