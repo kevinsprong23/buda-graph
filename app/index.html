@@ -21,6 +21,10 @@
       width: 300px;
       padding: 5px; 0px 5px 0px;
     }
+    
+    .list-header {
+      text-decoration: underline;
+    }
 
     .sim-score {
       display: inline-block;
@@ -33,10 +37,23 @@
     <h3>People you may know: BUDA edition</h3>
     <input type="text" ng-model="nameFilter" placeholder="Enter player name..."/>
     <div id="list" ng-repeat="player in playerList | filter: searchFilter">
-      <p>Strongest missing edges for {{player.id}}: </p>
+      <h4>Results for {{player.id}}: </h4>
+      <h5>Strongest missing edges: </h5>
+      <div class="list-entry list-header">
+        Player <div class="sim-score list-header">Score</div>
+      </div>
       <div class="list-entry" ng-repeat="sim in player.list">
         {{sim.n}} <div class="sim-score">{{ sim.s }}</div>
       </div>
+      
+      <h5>Percentage of players in K-degree ego network: </h5>
+      <div class="list-entry list-header">
+        Degrees of separation <div class="sim-score list-header">% of BUDA</div>
+      </div>
+      <div class="list-entry" ng-repeat="ego in player.egos">
+        {{ego.k}} <div class="sim-score">{{ ego.p }}%</div>
+      </div>
+      
     </div>
   </div>
   <script src="http://kevinsprong.com/scripts/angular.min.js"></script>

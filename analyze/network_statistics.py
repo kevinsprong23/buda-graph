@@ -8,6 +8,7 @@ import numpy as np
 from graph_functions import load_adjacency_matrix
 import aperture as ap
 import matplotlib.pyplot as plt
+import json
 
 def calc_node_degree(adj_mat):
     """ return a list of each node's degree """
@@ -54,6 +55,17 @@ if __name__ == "__main__":
     mean_edge_weights = calc_mean_edge_weight(adj_mat)
     edge_weight_list = get_edge_weight_list(adj_mat)
 
+    # get ego results for degrees 1 and 2 (from json'd file):
+    ego_json_file = '../app/egos.json'
+    first_degree = []
+    second_degree = []
+    with open(ego_json_file) as file_in:
+        ego_str = file_in.readline()
+        egos = json.loads(ego_str)
+    for player in egos:
+        first_degree.append(player['list'][0]['p'] * 100)
+        second_degree.append(player['list'][1]['p'] * 100)
+
     # plot node degree versus edge weight
     plt.figure()
     plt.plot(weighted_node_degrees, mean_edge_weights, '.', alpha=0.05)
@@ -86,6 +98,13 @@ if __name__ == "__main__":
     plt.xlabel('Times two given players played together')
     plt.ylabel('Number of occurrences')
     plt.savefig('results/edge_weight_hist')
+
+    # plot ego degree results
+    plt.figure()
+    plt.plot(first_degree, second_degree, '.', alpha=0.05)
+    plt.xlabel('% of BUDA directly played with')
+    plt.ylabel('% of BUDA at Two Degrees of Separation')
+    plt.savefig('results/ego_correlation.png')
 
 
 

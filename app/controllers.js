@@ -13,6 +13,7 @@ angular.module('BudaApp.controllers', [])
   
   var loadNodes = $q.defer();
   var loadResults = $q.defer();
+  var loadEgos = $q.defer();
   
   $http({url: baseUrl + 'nodes.json'})
     .success(function (data) {
@@ -28,9 +29,22 @@ angular.module('BudaApp.controllers', [])
       loadResults.resolve(data);
     });
   
-  $q.all([loadNodes.promise, loadResults.promise])
+  $http({url: baseUrl + 'egos.json'})
+    .success(function (data) {
+      loadEgos.resolve(data);
+    });
+  
+  $q.all([loadNodes.promise, loadResults.promise, loadEgos.promise])
     .then(function(values) {
+      // make dict of ego values
+      var egoDict = {};
+      values[2].forEach(function(d) {
+        egoDict[d.id] = d.list;
+      })
+          
       $scope.playerList.forEach(function(player) {
+        // assign ego results
+        player.egos = egoDict[player.id];
         // replace id with name
         player.id = $scope.nodes[player.id];
         // same for player's list

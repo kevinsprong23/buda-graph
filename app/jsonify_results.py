@@ -14,6 +14,14 @@ if __name__ == "__main__":
                 similarity_results[player] = []
             similarity_results[player].append((player2, float(sim)))
 
+    ego_results = {}
+    with open('../analyze/results/ego_results.csv') as file_in:
+        for line in file_in:
+            pid, K, pct = line.strip().split(',')
+            if pid not in ego_results:
+                ego_results[pid] = []
+            ego_results[pid].append((K, float(pct)))
+
     # nodes
     nodes = {}
     with open('../data/player_graph/nodes.csv') as file_in:
@@ -31,8 +39,18 @@ if __name__ == "__main__":
         jsonified_results.append({'id': pid, 'list': j})
         jsonified_nodes.append({'id': pid, 'label': player})
 
+    # ego network results have id directly encoded instead of name
+    jsonified_ego = []
+    for pid in ego_results:
+        j = [{'k': K, 'p': round(100 * pct, 2)} for K, pct in ego_results[pid]]
+        jsonified_ego.append({'id': pid, 'list': j})
+
     # save
-    with open('similarities.json', 'w') as file_out, \
-         open('nodes.json', 'w') as node_file_out:
+    with open('similarities.json', 'w') as file_out:
         print(json.dumps(jsonified_results), file=file_out)
-        print(json.dumps(jsonified_nodes), file=node_file_out)
+
+    with open('nodes.json', 'w') as file_out:
+        print(json.dumps(jsonified_nodes), file=file_out)
+
+    with open('egos.json', 'w') as file_out:
+        print(json.dumps(jsonified_ego), file=file_out)

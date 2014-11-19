@@ -29,12 +29,11 @@ nodes_for_comparison = []
 with open(candidate_file_path) as cand_file:
     for line in cand_file:
         nodes_for_comparison.append(int(line))
-nodes_for_comparison = nodes_for_comparison[0:10]
 #==============================================================================
 
 def calc_ego_network_sizes(node_id, max_k=6, adj_mat=adj_mat):
     """
-    calculate the ego networks up to a given degree for a player
+    calculate the size of the ego networks up to a given degree for a player
     """
     if max_k < 1:
         return
