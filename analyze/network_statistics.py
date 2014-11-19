@@ -102,7 +102,7 @@ if __name__ == "__main__":
     # plot ego degree results
     plt.figure()
     plt.plot(first_degree, second_degree, '.', alpha=0.2)
-    plt.xlabel('% of BUDA directly played with')
+    plt.xlabel('% of BUDA Directly Played With')
     plt.ylabel('% of BUDA at Two Degrees of Separation')
     plt.savefig('results/ego_correlation.png')
 
