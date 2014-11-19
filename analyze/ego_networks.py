@@ -31,7 +31,7 @@ with open(candidate_file_path) as cand_file:
         nodes_for_comparison.append(int(line))
 #==============================================================================
 
-def calc_ego_network_sizes(node_id, max_k=4, adj_mat=adj_mat):
+def calc_ego_network_sizes(node_id, max_k=6, adj_mat=adj_mat):
     """
     calculate the ego networks up to a given degree for a player
     """
@@ -46,24 +46,23 @@ def calc_ego_network_sizes(node_id, max_k=4, adj_mat=adj_mat):
     ego_results.append((node_id, 1, sum(ego_vector)))  # tuple of results
 
     # get indices we need to search
-    this_ego = np.where(ego_vector > 0)
+    this_ego = np.where(ego_vector > 0)[0]
+
+    # set up processing loop
+    next_ego = np.zeros(adj_mat.shape[1])
     for i in range(2, max_k + 1):
-        next_ego = np.where(np.any(adj_mat[this_ego] > 0, axis=0))[0]
-        ego_vector[next_ego] = 1
+        next_ego[:] = 0
+        for j in this_ego:
+            next_ego[adj_mat[j] > 0] = 1
+        ego_vector[next_ego > 0] = 1
 
         # update ego results and vector for next round
-        ego_results.append((node_id, i, sum(ego_vector)))
-        this_ego = np.copy(next_ego)
+        ego_results.append((node_id, i, sum(ego_vector) + 1))  # include self
+        this_ego = np.where(next_ego > 0)[0]
 
     return ego_results
 
-if __name__ == "__main__":
- 
-    ego_results = calc_ego_network_sizes(9202)
-    for uid, K, N  in ego_results:
-        print(uid, K, round(N / len(nodes), 4))
 
-"""
 if __name__ == "__main__":
     # load node id's that we have already processed
     processed_ids = set()
@@ -105,4 +104,4 @@ if __name__ == "__main__":
     pool.join()
 
 
-"""
+
