@@ -63,8 +63,8 @@ if __name__ == "__main__":
         ego_str = file_in.readline()
         egos = json.loads(ego_str)
     for player in egos:
-        first_degree.append(player['list'][0]['p'] * 100)
-        second_degree.append(player['list'][1]['p'] * 100)
+        first_degree.append(player['list'][0]['p'])
+        second_degree.append(player['list'][1]['p'])
 
     # plot node degree versus edge weight
     plt.figure()
@@ -101,7 +101,7 @@ if __name__ == "__main__":
 
     # plot ego degree results
     plt.figure()
-    plt.plot(first_degree, second_degree, '.', alpha=0.05)
+    plt.plot(first_degree, second_degree, '.', alpha=0.2)
     plt.xlabel('% of BUDA directly played with')
     plt.ylabel('% of BUDA at Two Degrees of Separation')
     plt.savefig('results/ego_correlation.png')
