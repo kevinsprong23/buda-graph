@@ -15,6 +15,7 @@ angular.module('BudaApp.controllers', [])
   var loadResults = $q.defer();
   var loadEgos = $q.defer();
   
+  // load all three data files asynchronously
   $http({url: baseUrl + 'nodes.json'})
     .success(function (data) {
       data.forEach(function(node) {
