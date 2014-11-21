@@ -25,6 +25,12 @@ STEPS TO RUN
 
 * network_statistics.py: basic statistics about the network (node degree, edge weight)
 * similar_players.py: this is essentially a recommender system for each player: this searches all other players and find the list of N players most 'similar' to that player, and writes out the concatenation of each player's list to a file. 'similarity' here is the sum of [weighted jaccard similarity](http://static.googleusercontent.com/media/research.google.com/en/us/pubs/archive/36928.pdf) and [cosine similarity](http://en.wikipedia.org/wiki/Cosine_similarity).
+* ego_networks.py: this computes the % of BUDA covered for each recent player as a function of the degrees of separation K.
+
+###App
+
+a quick Angular-based search capability embedded in the blog post. The version here will run standalone in a web container
+
 
 ###Data
 
