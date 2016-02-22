@@ -3,13 +3,14 @@ Analysis of the BUDA Social Graph
 
 Repository for analysis of [BUDA](http://buda.org) players when considered as a social graph
 
+Read more [on my blog](http://kevinsprong.com/posts/2014/11/21/buda-social-graph/). 
+
 A note: I used python 3.3 for this, and made no effort towards python 2.x compatibility. Sorry.
 
 Dependencies: 
 
 * numpy
 * matplotlib 
-* [aperture](https://github.com/kevinsprong23/aperture) (only for network_statistics.py)
 
 STEPS TO RUN
 ============
